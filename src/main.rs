@@ -1,7 +1,10 @@
+use crate::projectile::run_projectile_simulation;
+
 mod tuple;
+mod projectile;
 
 fn main() {
-    println!("Hello, world!");
+    run_projectile_simulation();
 }
 
 fn a_larger_b(a: f64, b: f64) -> bool {
