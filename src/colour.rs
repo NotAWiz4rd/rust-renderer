@@ -2,11 +2,37 @@ use std::ops::{Add, Mul, Sub};
 
 use crate::util::a_equal_b;
 
+pub const BLACK: Colour = Colour { red: 0.0, green: 0.0, blue: 0.0 };
+pub const WHITE: Colour = Colour { red: 1.0, green: 1.0, blue: 1.0 };
+
 #[derive(Debug, Copy, Clone)]
 pub struct Colour {
     pub red: f64,
     pub green: f64,
     pub blue: f64,
+}
+
+impl Colour {
+    pub fn to_string(&self) -> String {
+        let mut string_builder = Self::normalize_value(self.red).to_string();
+        string_builder = string_builder.add(" ");
+        string_builder = string_builder.add(&Self::normalize_value(self.green).to_string());
+        string_builder = string_builder.add(" ");
+        string_builder = string_builder.add(&Self::normalize_value(self.blue).to_string());
+        string_builder.add(" ")
+    }
+
+    fn normalize_value(value: f64) -> u32 {
+        let value = value * 255.0;
+        let mut value = value.round().trunc();
+        if value < 0.0 {
+            value = 0.0
+        }
+        if value > 255.0 {
+            value = 255.0;
+        }
+        return value as u32;
+    }
 }
 
 pub fn colour(red: f64, green: f64, blue: f64) -> Colour {

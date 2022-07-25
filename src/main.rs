@@ -4,18 +4,110 @@ mod tuple;
 mod colour;
 mod projectile;
 mod util;
+mod canvas;
 
 fn main() {
     run_projectile_simulation();
 }
 
-fn a_larger_b(a: f64, b: f64) -> bool {
-    a.abs() - b.abs() < 1e-10
-}
-
 #[cfg(test)]
 mod tests {
     use crate::tuple::{cross_product, dot_product, vector_i};
+
+    mod ppm_tests {
+        use crate::canvas::canvas;
+        use crate::colour::colour;
+
+        #[test]
+        fn ppm_is_terminated_by_newline() {
+            let c = canvas(5, 3);
+            let ppm = c.to_ppm();
+            assert!(ppm.ends_with("\n"))
+        }
+
+        #[test]
+        fn splitting_long_lines_in_ppm() {
+            let mut c = canvas(10, 2);
+            for y in 0..2 {
+                for x in 0..10 {
+                    c.write_pixel(x, y, colour(1.0, 0.8, 0.6));
+                }
+            }
+            let ppm = c.to_ppm();
+
+            let mut line_iterator = ppm.lines();
+            let fourth_line = line_iterator.nth(3).unwrap();
+            let fifth_line = line_iterator.nth(0).unwrap();
+            let sixth_line = line_iterator.nth(0).unwrap();
+            let seventh_line = line_iterator.nth(0).unwrap();
+
+            assert_eq!(fourth_line, "255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204");
+            assert_eq!(fifth_line, "153 255 204 153 255 204 153 255 204 153 255 204 153");
+            assert_eq!(sixth_line, "255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204");
+            assert_eq!(seventh_line, "153 255 204 153 255 204 153 255 204 153 255 204 153");
+        }
+
+        #[test]
+        fn constructing_ppm_pixel_data() {
+            let mut c = canvas(5, 3);
+            let colour1 = colour(1.5, 0.0, 0.0);
+            let colour2 = colour(0.0, 0.5, 0.0);
+            let colour3 = colour(-0.5, 0.0, 1.0);
+            c.write_pixel(0, 0, colour1);
+            c.write_pixel(2, 1, colour2);
+            c.write_pixel(4, 2, colour3);
+
+            let ppm = c.to_ppm();
+            let mut line_iterator = ppm.lines();
+            let fourth_line = line_iterator.nth(3).unwrap();
+            let fifth_line = line_iterator.nth(0).unwrap();
+            let sixth_line = line_iterator.nth(0).unwrap();
+
+            assert_eq!(fourth_line, "255 0 0 0 0 0 0 0 0 0 0 0 0 0 0");
+            assert_eq!(fifth_line, "0 0 0 0 0 0 0 128 0 0 0 0 0 0 0");
+            assert_eq!(sixth_line, "0 0 0 0 0 0 0 0 0 0 0 0 0 0 255");
+        }
+
+        #[test]
+        fn constructing_ppm_header() {
+            let c = canvas(5, 3);
+            let ppm = c.to_ppm();
+
+            let mut line_iterator = ppm.lines();
+            let first_line = line_iterator.nth(0).unwrap();
+            let second_line = line_iterator.nth(0).unwrap();
+            let third_line = line_iterator.nth(0).unwrap();
+            assert_eq!(first_line, "P3");
+            assert_eq!(second_line, "5 3");
+            assert_eq!(third_line, "255");
+        }
+    }
+
+    mod canvas_tests {
+        use crate::canvas::canvas;
+        use crate::colour::{BLACK, colour};
+
+        #[test]
+        fn creating_a_canvas() {
+            let c = canvas(10, 20);
+            assert_eq!(c.width, 10);
+            assert_eq!(c.height, 20);
+
+            for i in 0..10 {
+                for j in 0..10 {
+                    assert_eq!(c.pixels[i][j], BLACK);
+                }
+            }
+        }
+
+        #[test]
+        fn writing_pixels_into_canvas() {
+            let mut c = canvas(10, 20);
+            let red = colour(1.0, 0.0, 0.0);
+            c.write_pixel(2, 3, red);
+            assert_eq!(c.pixels[2][3], red)
+        }
+    }
 
     mod colour_tests {
         use crate::colour::colour;
@@ -165,8 +257,8 @@ mod tests {
         #[test]
         fn subtracting_a_vector_from_a_point() {
             let p1 = point_i(3, 2, 1);
-            let p2 = vector_i(5, 6, 7);
-            assert_eq!(p1 - p2, point_i(-2, -4, -6));
+            let v1 = vector_i(5, 6, 7);
+            assert_eq!(p1 - v1, point_i(-2, -4, -6));
         }
 
         #[test]
