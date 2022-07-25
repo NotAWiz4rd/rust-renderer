@@ -1,7 +1,9 @@
 use crate::projectile::run_projectile_simulation;
 
 mod tuple;
+mod colour;
 mod projectile;
+mod util;
 
 fn main() {
     run_projectile_simulation();
@@ -14,6 +16,39 @@ fn a_larger_b(a: f64, b: f64) -> bool {
 #[cfg(test)]
 mod tests {
     use crate::tuple::{cross_product, dot_product, vector_i};
+
+    mod colour_tests {
+        use crate::colour::colour;
+
+        #[test]
+        fn creating_a_colour() {
+            let c = colour(-0.5, 0.4, 1.7);
+            assert_eq!(c.red, -0.5);
+            assert_eq!(c.green, 0.4);
+            assert_eq!(c.blue, 1.7);
+        }
+
+        #[test]
+        fn adding_colours() {
+            let c1 = colour(0.9, 0.6, 0.75);
+            let c2 = colour(0.7, 0.1, 0.25);
+            assert_eq!(c1 + c2, colour(1.6, 0.7, 1.0));
+        }
+
+        #[test]
+        fn subtracting_colours() {
+            let c1 = colour(0.9, 0.6, 0.75);
+            let c2 = colour(0.7, 0.1, 0.25);
+            assert_eq!(c1 - c2, colour(0.2, 0.5, 0.5));
+        }
+
+        #[test]
+        fn multiplying_colours() {
+            let c1 = colour(1.0, 0.2, 0.4);
+            let c2 = colour(0.9, 1.0, 0.1);
+            assert_eq!(c1 * c2, colour(0.9, 0.2, 0.04));
+        }
+    }
 
     #[test]
     fn cross_product_test() {
