@@ -1,13 +1,31 @@
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
+use crate::util::a_equal_b;
+
 pub const ZERO_VECTOR: Tuple = Tuple { x: 0.0, y: 0.0, z: 0.0, w: 0.0 };
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone)]
 pub struct Tuple {
     pub x: f64,
     pub y: f64,
     pub z: f64,
     pub w: f64,
+}
+
+impl PartialEq<Tuple> for Tuple {
+    fn eq(&self, other: &Tuple) -> bool {
+        a_equal_b(self.x, other.x) &&
+            a_equal_b(self.y, other.y) &&
+            a_equal_b(self.z, other.z) &&
+            a_equal_b(self.w, other.w)
+    }
+
+    fn ne(&self, other: &Tuple) -> bool {
+        !a_equal_b(self.x, other.x) ||
+            !a_equal_b(self.y, other.y) ||
+            !a_equal_b(self.z, other.z) ||
+            !a_equal_b(self.w, other.w)
+    }
 }
 
 pub fn point(x: f64, y: f64, z: f64) -> Tuple {
