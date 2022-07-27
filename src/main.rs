@@ -5,6 +5,7 @@ mod colour;
 mod projectile;
 mod util;
 mod canvas;
+mod matrix;
 
 fn main() {
     run_projectile_simulation();
@@ -13,6 +14,91 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use crate::tuple::{cross_product, dot_product, vector_i};
+
+    mod matrix_tests {
+        use crate::matrix::matrix;
+
+        #[test]
+        fn matrix_inequality() {
+            let m1 = matrix::<4>(
+                [[1.0, 2.0, 3.0, 4.0],
+                    [5.0, 6.0, 7.0, 8.0],
+                    [9.0, 8.0, 7.0, 6.0],
+                    [5.0, 4.0, 3.0, 2.0]]
+            );
+            let m2 = matrix::<4>(
+                [[2.0, 3.0, 4.0, 5.0],
+                    [6.0, 7.0, 8.0, 9.0],
+                    [8.0, 7.0, 6.0, 5.0],
+                    [4.0, 3.0, 2.0, 1.0]]
+            );
+
+            assert!(m1 != m2)
+        }
+
+        #[test]
+        fn matrix_equality() {
+            let m1 = matrix::<4>(
+                [[1.0, 2.0, 3.0, 4.0],
+                    [5.0, 6.0, 7.0, 8.0],
+                    [9.0, 8.0, 7.0, 6.0],
+                    [5.0, 4.0, 3.0, 2.0]]
+            );
+            let m2 = matrix::<4>(
+                [[1.0, 2.0, 3.0, 4.0],
+                    [5.0, 6.0, 7.0, 8.0],
+                    [9.0, 8.0, 7.0, 6.0],
+                    [5.0, 4.0, 3.0, 2.0]]
+            );
+
+            assert!(m1 == m2)
+        }
+
+        #[test]
+        fn three_by_three_matrix_works() {
+            let matrix = matrix::<3>(
+                [[-3.0, 5.0, 0.0],
+                    [1.0, -2.0, -7.0],
+                    [1.0, -2.0, 1.0]]
+            );
+            assert_eq!(matrix.data[0][0], -3.0);
+            assert_eq!(matrix.data[1][1], -2.0);
+            assert_eq!(matrix.data[2][2], 1.0);
+        }
+
+        #[test]
+        fn two_by_two_matrix_works() {
+            let matrix = matrix::<2>(
+                [[-3.0, 5.0],
+                    [1.0, -2.0]]
+            );
+
+            assert_eq!(matrix.data[0][0], -3.0);
+            assert_eq!(matrix.data[0][1], 5.0);
+            assert_eq!(matrix.data[1][0], 1.0);
+            assert_eq!(matrix.data[1][1], -2.0);
+        }
+
+        #[test]
+        fn constructing_and_inspecting_a_matrix() {
+            let matrix = matrix::<4>(
+                [
+                    [1.0, 2.0, 3.0, 4.0],
+                    [5.5, 6.5, 7.5, 8.5],
+                    [9.0, 10.0, 11.0, 12.0],
+                    [13.5, 14.5, 15.5, 16.5],
+                ]
+            );
+
+            assert_eq!(matrix.data[0][0], 1.0);
+            assert_eq!(matrix.data[0][3], 4.0);
+            assert_eq!(matrix.data[1][0], 5.5);
+            assert_eq!(matrix.data[1][2], 7.5);
+            assert_eq!(matrix.data[2][2], 11.0);
+            assert_eq!(matrix.data[3][0], 13.5);
+            assert_eq!(matrix.data[3][2], 15.5);
+        }
+    }
 
     mod ppm_tests {
         use crate::canvas::canvas;
