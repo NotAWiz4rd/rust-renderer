@@ -52,14 +52,17 @@ impl<const SIZE: usize> PartialEq for Matrix<SIZE> {
     }
 }
 
-impl<const SIZE: usize> Mul for Matrix<SIZE> {
+impl Mul for Matrix<4> {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self::Output {
-        let mut m = matrix_empty::<SIZE>();
-        for row in 0..SIZE {
-            for column in 0..SIZE {
-                todo!()
+        let mut m = matrix_empty::<4>();
+        for row in 0..3 {
+            for column in 0..3 {
+                m.data[row][column] = self.data[row][0] * rhs.data[0][column]
+                    + self.data[row][1] * rhs.data[1][column]
+                    + self.data[row][2] * rhs.data[2][column]
+                    + self.data[row][3] * rhs.data[3][column];
             }
         }
         return m;
