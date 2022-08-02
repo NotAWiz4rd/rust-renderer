@@ -1,6 +1,6 @@
 use crate::canvas::canvas;
 use crate::colour::colour;
-use crate::tuple::{point_i, Tuple, vector, vector_i};
+use crate::tuple::{point_i, Tuple, vector};
 use crate::util::write_file;
 
 pub fn run_projectile_simulation() {

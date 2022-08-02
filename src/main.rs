@@ -1,3 +1,5 @@
+#![feature(generic_const_exprs)]
+
 use crate::projectile::run_projectile_simulation;
 
 mod tuple;
@@ -16,7 +18,122 @@ mod tests {
     use crate::tuple::{cross_product, dot_product, vector_i};
 
     mod matrix_tests {
-        use crate::matrix::matrix;
+        use crate::matrix::{IDENTITY_MATRIX, matrix};
+        use crate::tuple::Tuple;
+
+        #[test]
+        fn calculating_minor() {
+            let m1 = matrix::<3>([
+                [3.0, 5.0, 0.0],
+                [2.0, -1.0, -7.0],
+                [6.0, -1.0, 5.0],
+            ]);
+            let m2 = m1.submatrix(1, 0);
+
+            assert_eq!(m2.determinant(), 25.0);
+            assert_eq!(m1.minor(1, 0), 25.0);
+        }
+
+        #[test]
+        fn small_submatrix() {
+            let m = matrix::<3>([
+                [1.0, 5.0, 0.0],
+                [-3.0, 2.0, 7.0],
+                [0.0, 6.0, -3.0],
+            ]);
+
+            let expected_result = matrix::<2>([
+                [-3.0, 2.0],
+                [0.0, 6.0],
+            ]);
+            assert_eq!(m.submatrix(0, 2), expected_result);
+        }
+
+        #[test]
+        fn larger_submatrix() {
+            let m = matrix::<4>([
+                [-6.0, 1.0, 1.0, 6.0],
+                [-8.0, 5.0, 8.0, 6.0],
+                [-1.0, 0.0, 8.0, 2.0],
+                [-7.0, 1.0, -1.0, 1.0],
+            ]);
+
+            let expected_result = matrix::<3>([
+                [-6.0, 1.0, 6.0],
+                [-8.0, 8.0, 6.0],
+                [-7.0, -1.0, 1.0],
+            ]);
+            assert_eq!(m.submatrix(2, 1), expected_result);
+        }
+
+        #[test]
+        fn determinant_of_matrix() {
+            let m = matrix::<2>([
+                [1.0, 5.0],
+                [-3.0, 2.0]
+            ]);
+            assert_eq!(m.determinant(), 17.0)
+        }
+
+        #[test]
+        fn transposing_matrix() {
+            let m = matrix([
+                [0.0, 9.0, 3.0, 0.0],
+                [9.0, 8.0, 0.0, 8.0],
+                [1.0, 8.0, 5.0, 3.0],
+                [0.0, 0.0, 5.0, 8.0]
+            ]);
+
+            let expected_result = matrix([
+                [0.0, 9.0, 1.0, 0.0],
+                [9.0, 8.0, 8.0, 0.0],
+                [3.0, 0.0, 5.0, 5.0],
+                [0.0, 8.0, 3.0, 8.0]
+            ]);
+            assert_eq!(m.transpose(), expected_result);
+        }
+
+        #[test]
+        fn transposing_identity_matrix() {
+            let transposed = IDENTITY_MATRIX.transpose();
+            assert_eq!(transposed, IDENTITY_MATRIX);
+        }
+
+        #[test]
+        fn matrix_multiply_by_identity_matrix() {
+            let m = matrix::<4>(
+                [[0.0, 1.0, 2.0, 3.0],
+                    [1.0, 2.0, 4.0, 8.0],
+                    [2.0, 4.0, 8.0, 16.0],
+                    [4.0, 8.0, 16.0, 32.0]]
+            );
+
+            assert_eq!(m * IDENTITY_MATRIX, m);
+        }
+
+        #[test]
+        fn matrix_multiply_with_tuple() {
+            let m = matrix::<4>(
+                [[1.0, 2.0, 3.0, 4.0],
+                    [2.0, 4.0, 4.0, 2.0],
+                    [8.0, 6.0, 4.0, 1.0],
+                    [0.0, 0.0, 0.0, 1.0]]
+            );
+            let t = Tuple {
+                x: 1.0,
+                y: 2.0,
+                z: 3.0,
+                w: 1.0,
+            };
+
+            let expected_result = Tuple {
+                x: 18.0,
+                y: 24.0,
+                z: 33.0,
+                w: 1.0,
+            };
+            assert_eq!(m * t, expected_result);
+        }
 
         #[test]
         fn matrix_multiplication() {

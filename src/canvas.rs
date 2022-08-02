@@ -1,6 +1,6 @@
 use std::ops::Add;
 
-use crate::colour::{BLACK, Colour, colour};
+use crate::colour::{BLACK, Colour};
 
 pub struct Canvas {
     pub width: u32,
@@ -30,10 +30,8 @@ impl Canvas {
         ppm = ppm.add("\n");
         ppm = ppm.add("255\n");
 
-        let mut line_contents = String::new();
-
         for height in 0..self.height as usize {
-            line_contents = String::new();
+            let mut line_contents = String::new();
             for width in 0..self.width as usize {
                 line_contents = line_contents.add(&self.pixels[height][width].to_string() as &str)
             }
