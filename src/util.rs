@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::Write;
 
 pub fn a_equal_b(a: f64, b: f64) -> bool {
-    a.abs() - b.abs() < 1e-10
+    a.abs() - b.abs() < 1e-5
 }
 
 pub fn write_file(filepath: &str, content: &String) -> std::io::Result<()> {

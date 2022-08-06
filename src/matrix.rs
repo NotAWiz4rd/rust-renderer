@@ -67,6 +67,22 @@ impl<const SIZE: usize> Matrix<SIZE> {
 }
 
 impl Matrix<4> {
+    pub fn invert(&self) -> Matrix<4> {
+        let mut inverted = matrix_empty::<4>();
+        let determinant = self.determinant();
+        for row in 0..4 {
+            for column in 0..4 {
+                let c = self.cofactor(row, column);
+                inverted.data[column][row] = c / determinant
+            }
+        }
+        return inverted;
+    }
+
+    pub fn is_invertible(&self) -> bool {
+        self.determinant() != 0.0
+    }
+
     pub fn determinant(&self) -> f64 {
         let mut determinant = 0.0;
         for column in 0..4 {
@@ -91,6 +107,22 @@ impl Matrix<4> {
 }
 
 impl Matrix<3> {
+    pub fn invert(&self) -> Matrix<3> {
+        let mut inverted = matrix_empty::<3>();
+        let determinant = self.determinant();
+        for row in 0..3 {
+            for column in 0..3 {
+                let c = self.cofactor(row, column);
+                inverted.data[column][row] = c / determinant
+            }
+        }
+        return inverted;
+    }
+
+    pub fn is_invertible(&self) -> bool {
+        self.determinant() != 0.0
+    }
+
     pub fn determinant(&self) -> f64 {
         let mut determinant = 0.0;
         for column in 0..3 {
