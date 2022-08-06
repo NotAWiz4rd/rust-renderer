@@ -22,6 +22,48 @@ mod tests {
         use crate::tuple::Tuple;
 
         #[test]
+        fn calculating_determinant_of_4_by_4() {
+            let m = matrix::<4>([
+                [-2.0, -8.0, 3.0, 5.0],
+                [-3.0, 1.0, 7.0, 3.0],
+                [1.0, 2.0, -9.0, 6.0],
+                [-6.0, 7.0, 7.0, -9.0],
+            ]);
+            assert_eq!(m.cofactor(0, 0), 690.0);
+            assert_eq!(m.cofactor(0, 1), 447.0);
+            assert_eq!(m.cofactor(0, 2), 210.0);
+            assert_eq!(m.cofactor(0, 3), 51.0);
+            assert_eq!(m.determinant(), -4071.0);
+        }
+
+        #[test]
+        fn calculating_determinant_of_3_by_3() {
+            let m = matrix::<3>([
+                [1.0, 2.0, 6.0],
+                [-5.0, 8.0, -4.0],
+                [2.0, 6.0, 4.0],
+            ]);
+            assert_eq!(m.cofactor(0, 0), 56.0);
+            assert_eq!(m.cofactor(0, 1), 12.0);
+            assert_eq!(m.cofactor(0, 2), -46.0);
+            assert_eq!(m.determinant(), -196.0);
+        }
+
+        #[test]
+        fn calculating_cofactor() {
+            let m = matrix::<3>([
+                [3.0, 5.0, 0.0],
+                [2.0, -1.0, -7.0],
+                [6.0, -1.0, 5.0],
+            ]);
+
+            assert_eq!(m.minor(0, 0), -12.0);
+            assert_eq!(m.cofactor(0, 0), -12.0);
+            assert_eq!(m.minor(1, 0), 25.0);
+            assert_eq!(m.cofactor(1, 0), -25.0);
+        }
+
+        #[test]
         fn calculating_minor() {
             let m1 = matrix::<3>([
                 [3.0, 5.0, 0.0],

@@ -66,10 +66,51 @@ impl<const SIZE: usize> Matrix<SIZE> {
     }
 }
 
-impl Matrix<3> {
+impl Matrix<4> {
+    pub fn determinant(&self) -> f64 {
+        let mut determinant = 0.0;
+        for column in 0..4 {
+            determinant += self.data[0][column] * self.cofactor(0, column)
+        }
+        return determinant;
+    }
+
     pub fn minor(&self, delete_row: usize, delete_column: usize) -> f64 {
         let submatrix = self.submatrix(delete_row, delete_column);
         submatrix.determinant()
+    }
+
+    pub fn cofactor(&self, delete_row: usize, delete_column: usize) -> f64 {
+        let minor = self.minor(delete_row, delete_column);
+        return if (delete_column + delete_row) % 2 == 0 {
+            minor
+        } else {
+            -minor
+        };
+    }
+}
+
+impl Matrix<3> {
+    pub fn determinant(&self) -> f64 {
+        let mut determinant = 0.0;
+        for column in 0..3 {
+            determinant += self.data[0][column] * self.cofactor(0, column)
+        }
+        return determinant;
+    }
+
+    pub fn minor(&self, delete_row: usize, delete_column: usize) -> f64 {
+        let submatrix = self.submatrix(delete_row, delete_column);
+        submatrix.determinant()
+    }
+
+    pub fn cofactor(&self, delete_row: usize, delete_column: usize) -> f64 {
+        let minor = self.minor(delete_row, delete_column);
+        return if (delete_column + delete_row) % 2 == 0 {
+            minor
+        } else {
+            -minor
+        };
     }
 }
 
