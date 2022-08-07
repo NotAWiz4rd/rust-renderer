@@ -1,16 +1,17 @@
 #![feature(generic_const_exprs)]
 
-use crate::projectile::run_projectile_simulation;
+use crate::experiments::clock::render_clock;
+use crate::experiments::projectile::run_projectile_simulation;
 
 mod tuple;
 mod colour;
-mod projectile;
+mod experiments;
 mod util;
 mod canvas;
 mod matrix;
 
 fn main() {
-    run_projectile_simulation();
+    render_clock();
 }
 
 #[cfg(test)]
