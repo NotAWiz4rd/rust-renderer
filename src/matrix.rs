@@ -11,6 +11,10 @@ pub const IDENTITY_MATRIX: Matrix<4> = matrix::<4>([
     [0.0, 0.0, 0.0, 1.0],
 ]);
 
+pub fn identity() -> Matrix<4> {
+    IDENTITY_MATRIX
+}
+
 #[derive(Debug, Copy, Clone)]
 pub struct Matrix<const SIZE: usize> {
     pub data: [[f64; SIZE]; SIZE],
@@ -134,6 +138,31 @@ impl<const SIZE: usize> Matrix<SIZE> {
 }
 
 impl Matrix<4> {
+    pub fn rotate_x(self, rotation: f64) -> Matrix<4> {
+        let transform = rotation_x(rotation);
+        transform * self
+    }
+
+    pub fn rotate_y(self, rotation: f64) -> Matrix<4> {
+        let transform = rotation_y(rotation);
+        transform * self
+    }
+
+    pub fn rotate_z(self, rotation: f64) -> Matrix<4> {
+        let transform = rotation_z(rotation);
+        transform * self
+    }
+
+    pub fn scale(self, x: f64, y: f64, z: f64) -> Matrix<4> {
+        let transform = scaling(x, y, z);
+        transform * self
+    }
+
+    pub fn translate(self, x: f64, y: f64, z: f64) -> Matrix<4> {
+        let transform = translation(x, y, z);
+        transform * self
+    }
+
     pub fn invert(&self) -> Option<Matrix<4>> {
         if self.determinant() == 0.0 {
             return None;

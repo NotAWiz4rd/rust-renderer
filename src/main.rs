@@ -18,6 +18,44 @@ mod tests {
     use crate::tuple::{cross_product, dot_product, vector_i};
 
     mod transformations {
+        use std::f64::consts::PI;
+
+        use crate::matrix::{identity, rotation_x, scaling_i, translation_i};
+        use crate::tuple::point_i;
+
+        #[test]
+        fn chained_transformations_must_be_applied_in_reverse_order() {
+            let p = point_i(1, 0, 1);
+            let rot = rotation_x(PI / 2.0);
+            let scale = scaling_i(5, 5, 5);
+            let translate = translation_i(10, 5, 7);
+            let transform = identity().rotate_x(PI / 2.0).scale(5.0, 5.0, 5.0).translate(10.0, 5.0, 7.0);
+
+            let chained_transformation = translate * scale * rot;
+            assert_eq!(chained_transformation * p, point_i(15, 0, 7));
+            assert_eq!(transform * p, point_i(15, 0, 7));
+        }
+
+        #[test]
+        fn individual_transformations_are_applied_in_sequence() {
+            let p = point_i(1, 0, 1);
+            let rot = rotation_x(PI / 2.0);
+            let scale = scaling_i(5, 5, 5);
+            let translate = translation_i(10, 5, 7);
+
+            // apply rotation first
+            let p = rot * p;
+            assert_eq!(p, point_i(1, -1, 0));
+
+            // then the scaling
+            let p = scale * p;
+            assert_eq!(p, point_i(5, -5, 0));
+
+            // then the translation
+            let p = translate * p;
+            assert_eq!(p, point_i(15, 0, 7));
+        }
+
         mod shearing {
             use crate::matrix::{shearing, shearing_i};
             use crate::tuple::point_i;
