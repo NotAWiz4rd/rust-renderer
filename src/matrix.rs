@@ -28,6 +28,33 @@ pub const fn matrix<const SIZE: usize>(rows: [[f64; SIZE]; SIZE]) -> Matrix<SIZE
     }
 }
 
+pub fn rotation_x(rotation: f64) -> Matrix<4> {
+    let mut tranform = IDENTITY_MATRIX;
+    tranform.data[1][1] = f64::cos(rotation);
+    tranform.data[1][2] = -f64::sin(rotation);
+    tranform.data[2][1] = f64::sin(rotation);
+    tranform.data[2][2] = f64::cos(rotation);
+    return tranform;
+}
+
+pub fn rotation_y(rotation: f64) -> Matrix<4> {
+    let mut tranform = IDENTITY_MATRIX;
+    tranform.data[0][0] = f64::cos(rotation);
+    tranform.data[0][2] = -f64::sin(rotation);
+    tranform.data[2][0] = -f64::sin(rotation);
+    tranform.data[2][2] = f64::cos(rotation);
+    return tranform;
+}
+
+pub fn rotation_z(rotation: f64) -> Matrix<4> {
+    let mut tranform = IDENTITY_MATRIX;
+    tranform.data[0][0] = f64::cos(rotation);
+    tranform.data[0][1] = -f64::sin(rotation);
+    tranform.data[1][0] = f64::sin(rotation);
+    tranform.data[1][1] = f64::cos(rotation);
+    return tranform;
+}
+
 pub fn translation_i(x: i32, y: i32, z: i32) -> Matrix<4> {
     translation(x as f64, y as f64, z as f64)
 }
