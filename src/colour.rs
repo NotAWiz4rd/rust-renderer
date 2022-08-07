@@ -4,6 +4,9 @@ use crate::util::a_equal_b;
 
 pub const BLACK: Colour = Colour { red: 0.0, green: 0.0, blue: 0.0 };
 pub const WHITE: Colour = Colour { red: 1.0, green: 1.0, blue: 1.0 };
+pub const RED: Colour = Colour { red: 1.0, green: 0.0, blue: 0.0 };
+pub const GREEN: Colour = Colour { red: 0.0, green: 1.0, blue: 0.0 };
+pub const BLUE: Colour = Colour { red: 0.0, green: 0.0, blue: 1.0 };
 
 #[derive(Debug, Copy, Clone)]
 pub struct Colour {

@@ -1,6 +1,7 @@
 #![feature(generic_const_exprs)]
 
 use crate::experiments::clock::render_clock;
+use crate::experiments::first_sphere_image::{render_basic_sphere_multithreaded, render_basic_sphere_singlethreaded};
 use crate::experiments::projectile::run_projectile_simulation;
 
 mod tuple;
@@ -13,7 +14,8 @@ mod ray;
 mod objects;
 
 fn main() {
-    render_clock();
+    render_basic_sphere_singlethreaded();
+    render_basic_sphere_multithreaded(8);
 }
 
 #[cfg(test)]
