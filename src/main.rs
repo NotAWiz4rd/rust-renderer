@@ -9,6 +9,8 @@ mod experiments;
 mod util;
 mod canvas;
 mod matrix;
+mod ray;
+mod objects;
 
 fn main() {
     render_clock();
@@ -17,6 +19,246 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use crate::tuple::{cross_product, dot_product, vector_i};
+
+    mod rays {
+        use crate::matrix::{IDENTITY_MATRIX, scaling_i, translation_i};
+        use crate::objects::{Object, sphere};
+        use crate::objects::Object::Sphere;
+        use crate::ray::{intersection, Intersections, ray};
+        use crate::tuple::{point, point_i, vector_i};
+
+        #[test]
+        fn intersecting_a_translated_sphere_with_a_ray() {
+            let r = ray(point_i(0, 0, -5), vector_i(0, 0, 1));
+            let s = sphere().set_transform(translation_i(5, 0, 0));
+            let intersects = r.intersect(&s);
+
+            assert_eq!(intersects, Intersections::None);
+        }
+
+        #[test]
+        fn intersecting_a_scaled_sphere_with_a_ray() {
+            let r = ray(point_i(0, 0, -5), vector_i(0, 0, 1));
+            let s = sphere().set_transform(scaling_i(2, 2, 2));
+            let intersects = r.intersect(&s);
+
+            match intersects {
+                Intersections::Some(intersections) => {
+                    assert_eq!(intersections.len(), 2);
+                    assert_eq!(intersections[0].time, 3.0);
+                    assert_eq!(intersections[1].time, 7.0);
+                }
+                _ => assert!(false),
+            }
+        }
+
+        #[test]
+        fn changing_a_spheres_transformation() {
+            let s = sphere();
+            let t = translation_i(2, 3, 4);
+            let s = s.set_transform(t);
+
+            match s {
+                Sphere { position: _, radius: _, transformation } => {
+                    assert_eq!(transformation, t);
+                }
+            }
+        }
+
+        #[test]
+        fn sphere_default_transformation() {
+            let s = sphere();
+            match s {
+                Sphere { position: _, radius: _, transformation } => {
+                    assert_eq!(transformation, IDENTITY_MATRIX);
+                }
+            }
+        }
+
+        #[test]
+        fn scaling_a_ray() {
+            let r = ray(point_i(1, 2, 3), vector_i(0, 1, 0));
+            let translation = scaling_i(2, 3, 4);
+            let r2 = r.transform(translation);
+
+            assert_eq!(r2.origin, point_i(2, 6, 12));
+            assert_eq!(r2.direction, vector_i(0, 3, 0));
+        }
+
+        #[test]
+        fn translating_a_ray() {
+            let r = ray(point_i(1, 2, 3), vector_i(0, 1, 0));
+            let translation = translation_i(3, 4, 5);
+            let r2 = r.transform(translation);
+
+            assert_eq!(r2.origin, point_i(4, 6, 8));
+            assert_eq!(r2.direction, vector_i(0, 1, 0));
+        }
+
+        #[test]
+        fn hit_when_all_intersects_have_negative_t() {
+            let s = sphere();
+            let i1 = intersection(-2.0, s);
+            let i2 = intersection(-1.0, s);
+            let intersects = Intersections::Some([i2, i1]);
+
+            let hit = intersects.hit();
+            assert_eq!(hit, None);
+        }
+
+        #[test]
+        fn hit_when_some_intersects_have_negative_t() {
+            let s = sphere();
+            let i1 = intersection(1.0, s);
+            let i2 = intersection(-1.0, s);
+            let intersects = Intersections::Some([i2, i1]);
+
+            let hit = intersects.hit().unwrap();
+            assert_eq!(hit, i1);
+        }
+
+        #[test]
+        fn hit_when_all_intersects_have_positive_t() {
+            let s = sphere();
+            let i1 = intersection(1.0, s);
+            let i2 = intersection(2.0, s);
+            let intersects = Intersections::Some([i2, i1]);
+
+            let hit = intersects.hit().unwrap();
+            assert_eq!(hit, i1);
+        }
+
+        #[test]
+        fn intersect_sets_object_on_intersections() {
+            let r = ray(point_i(0, 0, -5), vector_i(0, 0, 1));
+            let s = sphere();
+            let intersects = r.intersect(&s);
+
+            match intersects {
+                Intersections::Some(intersections) => {
+                    assert_eq!(intersections.len(), 2);
+                    assert_eq!(intersections[0].object, s);
+                    assert_eq!(intersections[1].object, s);
+                }
+                _ => assert!(false),
+            }
+        }
+
+        #[test]
+        fn aggregating_intersections() {
+            let s = sphere();
+            let i1 = intersection(1.0, s);
+            let i2 = intersection(2.0, s);
+            let intersections = Intersections::Some([i1, i2]);
+
+            match intersections {
+                Intersections::Some(intersects) => {
+                    assert_eq!(intersects.len(), 2);
+                    assert_eq!(intersects[0].time, 1.0);
+                    assert_eq!(intersects[1].time, 2.0);
+                }
+                _ => assert!(false),
+            }
+        }
+
+        #[test]
+        fn intersection_encapsulates_t_and_object() {
+            let s = sphere();
+            let i = intersection(3.5, s);
+
+            assert_eq!(i.time, 3.5);
+            assert_eq!(i.object, s);
+        }
+
+        #[test]
+        fn sphere_is_behind_ray() {
+            let r = ray(point_i(0, 0, 5), vector_i(0, 0, 1));
+            let s = sphere();
+            let intersects = r.intersect(&s);
+
+            match intersects {
+                Intersections::Some(intersections) => {
+                    assert_eq!(intersections[0].time, -6.0);
+                    assert_eq!(intersections[1].time, -4.0);
+                }
+                _ => assert!(false),
+            }
+        }
+
+        #[test]
+        fn ray_originates_inside_sphere() {
+            let r = ray(point_i(0, 0, 0), vector_i(0, 0, 1));
+            let s = sphere();
+            let intersects = r.intersect(&s);
+
+            match intersects {
+                Intersections::Some(intersections) => {
+                    assert_eq!(intersections[0].time, -1.0);
+                    assert_eq!(intersections[1].time, 1.0);
+                }
+                _ => assert!(false),
+            }
+        }
+
+        #[test]
+        fn ray_misses_sphere() {
+            let r = ray(point_i(0, 2, -5), vector_i(0, 0, 1));
+            let s = sphere();
+            let intersects = r.intersect(&s);
+
+            assert_eq!(intersects, Intersections::None);
+        }
+
+        #[test]
+        fn ray_intersects_sphere_at_a_tangent() {
+            let r = ray(point_i(0, 1, -5), vector_i(0, 0, 1));
+            let s = sphere();
+            let intersects = r.intersect(&s);
+
+            match intersects {
+                Intersections::Some(intersections) => {
+                    assert_eq!(intersections[0].time, 5.0);
+                    assert_eq!(intersections[1].time, 5.0);
+                }
+                _ => assert!(false),
+            }
+        }
+
+        #[test]
+        fn ray_intersects_sphere_at_two_points() {
+            let r = ray(point_i(0, 0, -5), vector_i(0, 0, 1));
+            let s = sphere();
+            let intersects = r.intersect(&s);
+
+            match intersects {
+                Intersections::Some(intersections) => {
+                    assert_eq!(intersections[0].time, 4.0);
+                    assert_eq!(intersections[1].time, 6.0);
+                }
+                _ => assert!(false),
+            }
+        }
+
+        #[test]
+        fn computing_a_point_from_a_distance() {
+            let r = ray(point_i(2, 3, 4), vector_i(1, 0, 0));
+
+            assert_eq!(r.position(0.0), point_i(2, 3, 4));
+            assert_eq!(r.position(1.0), point_i(3, 3, 4));
+            assert_eq!(r.position(-1.0), point_i(1, 3, 4));
+            assert_eq!(r.position(2.5), point(4.5, 3.0, 4.0));
+        }
+
+        #[test]
+        fn creating_a_ray() {
+            let origin = point_i(1, 2, 3);
+            let direction = vector_i(4, 5, 6);
+            let r = ray(origin, direction);
+
+            assert_eq!(r.origin, origin);
+            assert_eq!(r.direction, direction);
+        }
+    }
 
     mod transformations {
         use std::f64::consts::PI;
@@ -58,7 +300,7 @@ mod tests {
         }
 
         mod shearing {
-            use crate::matrix::{shearing, shearing_i};
+            use crate::matrix::shearing_i;
             use crate::tuple::point_i;
 
             #[test]

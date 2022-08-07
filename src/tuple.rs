@@ -3,6 +3,7 @@ use std::ops::{Add, Div, Mul, Neg, Sub};
 use crate::util::a_equal_b;
 
 pub const ZERO_VECTOR: Tuple = Tuple { x: 0.0, y: 0.0, z: 0.0, w: 0.0 };
+pub const ORIGIN: Tuple = Tuple { x: 0.0, y: 0.0, z: 0.0, w: 1.0 };
 
 #[derive(Debug, Copy, Clone)]
 pub struct Tuple {
