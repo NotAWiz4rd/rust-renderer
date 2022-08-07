@@ -40,6 +40,19 @@ pub fn translation(x: f64, y: f64, z: f64) -> Matrix<4> {
     return transform;
 }
 
+pub fn scaling_i(x: i32, y: i32, z: i32) -> Matrix<4> {
+    scaling(x as f64, y as f64, z as f64)
+}
+
+pub fn scaling(x: f64, y: f64, z: f64) -> Matrix<4> {
+    let mut transform = matrix_empty::<4>();
+    transform.data[0][0] = x;
+    transform.data[1][1] = y;
+    transform.data[2][2] = z;
+    transform.data[3][3] = 1.0;
+    return transform;
+}
+
 impl<const SIZE: usize> Matrix<SIZE> {
     pub fn transpose(self) -> Self {
         let mut rows = [[0.0; SIZE]; SIZE];

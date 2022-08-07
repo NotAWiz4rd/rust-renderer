@@ -18,35 +18,71 @@ mod tests {
     use crate::tuple::{cross_product, dot_product, vector_i};
 
     mod transformations {
-        use crate::matrix::translation_i;
-        use crate::tuple::{point_i, vector_i};
+        mod scaling {
+            use crate::matrix::scaling_i;
+            use crate::tuple::{point_i, vector_i};
 
-        #[test]
-        fn translation_does_not_affect_vectors() {
-            let transform = translation_i(5, -3, 2);
-            let v = vector_i(-3, 4, 5);
-            assert_eq!(transform * v, v);
+            #[test]
+            fn reflection_is_scaling_by_negative_value() {
+                let transform = scaling_i(-1, 1, 1);
+                let p = point_i(2, 3, 4);
+                assert_eq!(transform * p, point_i(-2, 3, 4))
+            }
+
+            #[test]
+            fn multiplying_by_inverse_of_scaling_matrix() {
+                let transform = scaling_i(2, 3, 4);
+                let inverted = transform.invert().unwrap();
+                let v = vector_i(-4, 6, 8);
+                assert_eq!(inverted * v, vector_i(-2, 2, 2))
+            }
+
+            #[test]
+            fn scaling_matrix_applied_to_vector() {
+                let transform = scaling_i(2, 3, 4);
+                let v = vector_i(-4, 6, 8);
+                assert_eq!(transform * v, vector_i(-8, 18, 32))
+            }
+
+            #[test]
+            fn scaling_matrix_applied_to_point() {
+                let transform = scaling_i(2, 3, 4);
+                let p = point_i(-4, 6, 8);
+                assert_eq!(transform * p, point_i(-8, 18, 32))
+            }
         }
 
-        #[test]
-        fn multiplying_by_inverse_of_translation_matrix() {
-            let transform = translation_i(5, -3, 2);
-            let inverse = transform.invert().unwrap();
-            let p = point_i(-3, 4, 5);
-            assert_eq!(inverse * p, point_i(-8, 7, 3));
-        }
+        mod translation {
+            use crate::matrix::translation_i;
+            use crate::tuple::{point_i, vector_i};
 
-        #[test]
-        fn multiplying_by_a_translation_matrix() {
-            let transform = translation_i(5, -3, 2);
-            let p = point_i(-3, 4, 5);
-            assert_eq!(transform * p, point_i(2, 1, 7));
+            #[test]
+            fn translation_does_not_affect_vectors() {
+                let transform = translation_i(5, -3, 2);
+                let v = vector_i(-3, 4, 5);
+                assert_eq!(transform * v, v);
+            }
+
+            #[test]
+            fn multiplying_by_inverse_of_translation_matrix() {
+                let transform = translation_i(5, -3, 2);
+                let inverse = transform.invert().unwrap();
+                let p = point_i(-3, 4, 5);
+                assert_eq!(inverse * p, point_i(-8, 7, 3));
+            }
+
+            #[test]
+            fn multiplying_by_a_translation_matrix() {
+                let transform = translation_i(5, -3, 2);
+                let p = point_i(-3, 4, 5);
+                assert_eq!(transform * p, point_i(2, 1, 7));
+            }
         }
     }
 
     mod matrix_tests {
         use crate::matrix::{IDENTITY_MATRIX, matrix};
-        use crate::tuple::{Tuple, vector_i};
+        use crate::tuple::Tuple;
 
         #[test]
         fn multiplying_product_by_its_inverse() {
