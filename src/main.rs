@@ -18,6 +18,59 @@ mod tests {
     use crate::tuple::{cross_product, dot_product, vector_i};
 
     mod transformations {
+        mod shearing {
+            use crate::matrix::{shearing, shearing_i};
+            use crate::tuple::point_i;
+
+            #[test]
+            fn shearing_transformation_moves_z_in_proportion_to_y() {
+                let transform = shearing_i(0, 0, 0, 0, 0, 1);
+                let p = point_i(2, 3, 4);
+
+                assert_eq!(transform * p, point_i(2, 3, 7));
+            }
+
+            #[test]
+            fn shearing_transformation_moves_z_in_proportion_to_x() {
+                let transform = shearing_i(0, 0, 0, 0, 1, 0);
+                let p = point_i(2, 3, 4);
+
+                assert_eq!(transform * p, point_i(2, 3, 6));
+            }
+
+            #[test]
+            fn shearing_transformation_moves_y_in_proportion_to_z() {
+                let transform = shearing_i(0, 0, 0, 1, 0, 0);
+                let p = point_i(2, 3, 4);
+
+                assert_eq!(transform * p, point_i(2, 7, 4));
+            }
+
+            #[test]
+            fn shearing_transformation_moves_y_in_proportion_to_x() {
+                let transform = shearing_i(0, 0, 1, 0, 0, 0);
+                let p = point_i(2, 3, 4);
+
+                assert_eq!(transform * p, point_i(2, 5, 4));
+            }
+
+            #[test]
+            fn shearing_transformation_moves_x_in_proportion_to_z() {
+                let transform = shearing_i(0, 1, 0, 0, 0, 0);
+                let p = point_i(2, 3, 4);
+
+                assert_eq!(transform * p, point_i(6, 3, 4));
+            }
+
+            #[test]
+            fn shearing_transformation_moves_x_in_proportion_to_y() {
+                let transform = shearing_i(1, 0, 0, 0, 0, 0);
+                let p = point_i(2, 3, 4);
+
+                assert_eq!(transform * p, point_i(5, 3, 4));
+            }
+        }
+
         mod rotation {
             use std::f64::consts::PI;
 

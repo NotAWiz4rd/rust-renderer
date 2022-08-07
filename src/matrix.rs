@@ -28,6 +28,21 @@ pub const fn matrix<const SIZE: usize>(rows: [[f64; SIZE]; SIZE]) -> Matrix<SIZE
     }
 }
 
+pub fn shearing_i(x_y: i32, x_z: i32, y_x: i32, y_z: i32, z_x: i32, z_y: i32) -> Matrix<4> {
+    shearing(x_y as f64, x_z as f64, y_x as f64, y_z as f64, z_x as f64, z_y as f64)
+}
+
+pub fn shearing(x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Matrix<4> {
+    let mut transform = IDENTITY_MATRIX;
+    transform.data[0][1] = x_y;
+    transform.data[0][2] = x_z;
+    transform.data[1][0] = y_x;
+    transform.data[1][2] = y_z;
+    transform.data[2][0] = z_x;
+    transform.data[2][1] = z_y;
+    return transform;
+}
+
 pub fn rotation_x(rotation: f64) -> Matrix<4> {
     let mut tranform = IDENTITY_MATRIX;
     tranform.data[1][1] = f64::cos(rotation);
