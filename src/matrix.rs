@@ -28,6 +28,18 @@ pub const fn matrix<const SIZE: usize>(rows: [[f64; SIZE]; SIZE]) -> Matrix<SIZE
     }
 }
 
+pub fn translation_i(x: i32, y: i32, z: i32) -> Matrix<4> {
+    translation(x as f64, y as f64, z as f64)
+}
+
+pub fn translation(x: f64, y: f64, z: f64) -> Matrix<4> {
+    let mut transform = IDENTITY_MATRIX;
+    transform.data[0][3] = x;
+    transform.data[1][3] = y;
+    transform.data[2][3] = z;
+    return transform;
+}
+
 impl<const SIZE: usize> Matrix<SIZE> {
     pub fn transpose(self) -> Self {
         let mut rows = [[0.0; SIZE]; SIZE];
@@ -67,7 +79,10 @@ impl<const SIZE: usize> Matrix<SIZE> {
 }
 
 impl Matrix<4> {
-    pub fn invert(&self) -> Matrix<4> {
+    pub fn invert(&self) -> Option<Matrix<4>> {
+        if self.determinant() == 0.0 {
+            return None;
+        }
         let mut inverted = matrix_empty::<4>();
         let determinant = self.determinant();
         for row in 0..4 {
@@ -76,11 +91,7 @@ impl Matrix<4> {
                 inverted.data[column][row] = c / determinant
             }
         }
-        return inverted;
-    }
-
-    pub fn is_invertible(&self) -> bool {
-        self.determinant() != 0.0
+        return Some(inverted);
     }
 
     pub fn determinant(&self) -> f64 {
@@ -107,7 +118,10 @@ impl Matrix<4> {
 }
 
 impl Matrix<3> {
-    pub fn invert(&self) -> Matrix<3> {
+    pub fn invert(&self) -> Option<Matrix<3>> {
+        if self.determinant() == 0.0 {
+            return None;
+        }
         let mut inverted = matrix_empty::<3>();
         let determinant = self.determinant();
         for row in 0..3 {
@@ -116,11 +130,7 @@ impl Matrix<3> {
                 inverted.data[column][row] = c / determinant
             }
         }
-        return inverted;
-    }
-
-    pub fn is_invertible(&self) -> bool {
-        self.determinant() != 0.0
+        return Some(inverted);
     }
 
     pub fn determinant(&self) -> f64 {
@@ -204,10 +214,10 @@ impl Mul<Tuple> for Matrix<4> {
 
     fn mul(self, rhs: Tuple) -> Self::Output {
         Tuple {
-            x: self.data[0][0] * rhs.x + self.data[0][1] * rhs.y + self.data[0][2] * rhs.z + self.data[0][3] * rhs.x,
-            y: self.data[1][0] * rhs.x + self.data[1][1] * rhs.y + self.data[1][2] * rhs.z + self.data[1][3] * rhs.x,
-            z: self.data[2][0] * rhs.x + self.data[2][1] * rhs.y + self.data[2][2] * rhs.z + self.data[2][3] * rhs.x,
-            w: self.data[3][0] * rhs.x + self.data[3][1] * rhs.y + self.data[3][2] * rhs.z + self.data[3][3] * rhs.x,
+            x: self.data[0][0] * rhs.x + self.data[0][1] * rhs.y + self.data[0][2] * rhs.z + self.data[0][3] * rhs.w,
+            y: self.data[1][0] * rhs.x + self.data[1][1] * rhs.y + self.data[1][2] * rhs.z + self.data[1][3] * rhs.w,
+            z: self.data[2][0] * rhs.x + self.data[2][1] * rhs.y + self.data[2][2] * rhs.z + self.data[2][3] * rhs.w,
+            w: self.data[3][0] * rhs.x + self.data[3][1] * rhs.y + self.data[3][2] * rhs.z + self.data[3][3] * rhs.w,
         }
     }
 }

@@ -17,9 +17,36 @@ fn main() {
 mod tests {
     use crate::tuple::{cross_product, dot_product, vector_i};
 
+    mod transformations {
+        use crate::matrix::translation_i;
+        use crate::tuple::{point_i, vector_i};
+
+        #[test]
+        fn translation_does_not_affect_vectors() {
+            let transform = translation_i(5, -3, 2);
+            let v = vector_i(-3, 4, 5);
+            assert_eq!(transform * v, v);
+        }
+
+        #[test]
+        fn multiplying_by_inverse_of_translation_matrix() {
+            let transform = translation_i(5, -3, 2);
+            let inverse = transform.invert().unwrap();
+            let p = point_i(-3, 4, 5);
+            assert_eq!(inverse * p, point_i(-8, 7, 3));
+        }
+
+        #[test]
+        fn multiplying_by_a_translation_matrix() {
+            let transform = translation_i(5, -3, 2);
+            let p = point_i(-3, 4, 5);
+            assert_eq!(transform * p, point_i(2, 1, 7));
+        }
+    }
+
     mod matrix_tests {
         use crate::matrix::{IDENTITY_MATRIX, matrix};
-        use crate::tuple::Tuple;
+        use crate::tuple::{Tuple, vector_i};
 
         #[test]
         fn multiplying_product_by_its_inverse() {
@@ -37,7 +64,7 @@ mod tests {
             ]);
 
             let product = m1 * m2;
-            assert_eq!(product * m2.invert(), m1)
+            assert_eq!(product * m2.invert().unwrap(), m1)
         }
 
         #[test]
@@ -48,7 +75,7 @@ mod tests {
                 [7.0, 7.0, -6.0, -7.0],
                 [1.0, -3.0, 7.0, 4.0],
             ]);
-            let m_inverted = m.invert();
+            let m_inverted = m.invert().unwrap();
 
             assert_eq!(m.determinant(), 532.0);
             assert_eq!(m.cofactor(2, 3), -160.0);
@@ -68,7 +95,7 @@ mod tests {
                 [-6.0, 0.0, 9.0, 6.0],
                 [-3.0, 0.0, -9.0, -4.0],
             ]);
-            let m2_inverted = m2.invert();
+            let m2_inverted = m2.invert().unwrap();
 
             assert_eq!(m2_inverted, matrix::<4>([
                 [-0.15385, -0.15385, -0.28205, -0.53846],
@@ -83,7 +110,7 @@ mod tests {
                 [-4.0, 9.0, 6.0, 4.0],
                 [-7.0, 6.0, 6.0, 2.0],
             ]);
-            let m3_inverted = m3.invert();
+            let m3_inverted = m3.invert().unwrap();
 
             assert_eq!(m3_inverted, matrix::<4>([
                 [-0.04074, -0.07778, 0.14444, -0.22222],
@@ -102,7 +129,7 @@ mod tests {
                 [0.0, 0.0, 0.0, 0.0],
             ]);
             assert_eq!(m.determinant(), 0.0);
-            assert!(!m.is_invertible())
+            assert_eq!(m.invert(), None)
         }
 
         #[test]
@@ -115,7 +142,7 @@ mod tests {
             ]);
 
             assert_eq!(m.determinant(), -2120.0);
-            assert!(m.is_invertible())
+            assert_ne!(m.invert(), None)
         }
 
         #[test]
