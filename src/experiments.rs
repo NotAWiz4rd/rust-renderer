@@ -2,7 +2,7 @@ pub mod first_sphere_image {
     use std::f64::consts::PI;
     use std::sync::mpsc;
     use std::thread;
-    use std::time::{Instant, SystemTime};
+    use std::time::{Instant};
 
     use crate::canvas::{canvas, Canvas};
     use crate::colour::{GREEN, RED};

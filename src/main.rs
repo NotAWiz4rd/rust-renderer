@@ -22,6 +22,65 @@ fn main() {
 mod tests {
     use crate::tuple::{cross_product, dot_product, vector_i};
 
+    mod shading {
+        use std::f64::consts::PI;
+        use crate::matrix::{rotation_z, scaling, translation_i};
+        use crate::objects::sphere;
+        use crate::tuple::{point, point_i, vector, vector_i};
+
+        #[test]
+        fn computing_normal_on_a_transformed_sphere() {
+            let s = sphere();
+            let m = scaling(1.0, 0.5, 1.0) * rotation_z(PI / 5.0);
+            s.set_transform(m);
+            let n = s.normal_at(point(0.0, f64::sqrt(2.0)/2.0, -f64::sqrt(2.0)/2.0));
+            assert_eq!(n, vector(0.0, 0.97014, -0.24254))
+        }
+
+        #[test]
+        fn computing_normal_on_a_translated_sphere() {
+            let s = sphere();
+            s.set_transform(translation_i(0, 1, 0));
+            let n = s.normal_at(point(0.0, 1.70711, -0.70711));
+            assert_eq!(n, vector(0.0, 0.70711, -0.70711))
+        }
+
+        #[test]
+        fn normal_is_normalized() {
+            let s = sphere();
+            let n = s.normal_at(point(f64::sqrt(3.0) / 3.0, f64::sqrt(3.0) / 3.0, f64::sqrt(3.0) / 3.0));
+            assert_eq!(n, n.normalize())
+        }
+
+        #[test]
+        fn normal_on_a_sphere4() {
+            let s = sphere();
+            let n = s.normal_at(point(f64::sqrt(3.0) / 3.0, f64::sqrt(3.0) / 3.0, f64::sqrt(3.0) / 3.0));
+            assert_eq!(n, vector(f64::sqrt(3.0) / 3.0, f64::sqrt(3.0) / 3.0, f64::sqrt(3.0) / 3.0));
+        }
+
+        #[test]
+        fn normal_on_a_sphere3() {
+            let s = sphere();
+            let n = s.normal_at(point_i(0, 0, 1));
+            assert_eq!(n, vector_i(0, 0, 1));
+        }
+
+        #[test]
+        fn normal_on_a_sphere2() {
+            let s = sphere();
+            let n = s.normal_at(point_i(0, 1, 0));
+            assert_eq!(n, vector_i(0, 1, 0));
+        }
+
+        #[test]
+        fn normal_on_a_sphere1() {
+            let s = sphere();
+            let n = s.normal_at(point_i(1, 0, 0));
+            assert_eq!(n, vector_i(1, 0, 0));
+        }
+    }
+
     mod rays {
         use crate::matrix::{IDENTITY_MATRIX, scaling_i, translation_i};
         use crate::objects::{Object, sphere};

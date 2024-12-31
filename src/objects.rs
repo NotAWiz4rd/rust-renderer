@@ -31,4 +31,21 @@ impl Object {
             }
         }
     }
+
+    pub fn normal_at(&self, point: Tuple) -> Tuple {
+        match self {
+            Sphere { position, radius: _, transformation } => {
+                let object_point = transformation.invert().unwrap() * point;
+                let object_normal = object_point - *position;
+                let world_normal = transformation.invert().unwrap().transpose() * object_normal;
+                let world_normal = Tuple {
+                    x: world_normal.x,
+                    y: world_normal.y,
+                    z: world_normal.z,
+                    w: 0.0,
+                };
+                world_normal.normalize()
+            }
+        }
+    }
 }
